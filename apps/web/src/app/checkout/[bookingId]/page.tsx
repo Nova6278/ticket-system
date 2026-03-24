@@ -38,16 +38,23 @@ function CheckoutForm({ bookingId }: { bookingId: string }) {
     setProcessing(true);
     setError('');
 
-    const { error: stripeError } = await stripe.confirmPayment({
+    const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/my-tickets`,
       },
+      redirect: 'if_required',
     });
 
     if (stripeError) {
       setError(stripeError.message || 'Payment failed');
       setProcessing(false);
+      return;
+    }
+
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      await paymentsAPI.confirm(bookingId);
+      router.push('/my-tickets');
     }
   }
 
@@ -146,9 +153,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Departure</span>
-                <span className="font-medium">
-                  {formatDate(booking.event_date)}
-                </span>
+                <span className="font-medium">{formatDate(booking.event_date)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Venue</span>
@@ -167,10 +172,7 @@ export default function CheckoutPage() {
         {clientSecret && (
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h2 className="font-semibold text-gray-900 mb-6">Payment details</h2>
-            <Elements
-              stripe={stripePromise}
-              options={{ clientSecret }}
-            >
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutForm bookingId={bookingId} />
             </Elements>
           </div>

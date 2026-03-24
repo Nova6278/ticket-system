@@ -54,6 +54,8 @@ export const ticketsAPI = {
 export const paymentsAPI = {
   createIntent: (bookingId: string) =>
     api.post('/payments/create-intent', { bookingId }),
+  confirm: (bookingId: string) =>
+    api.post(`/payments/confirm/${bookingId}`, {}),
 };
 
 export default api;

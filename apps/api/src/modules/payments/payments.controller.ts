@@ -10,10 +10,7 @@ import { env } from '../../config/env';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
-export async function createPaymentIntentHandler(
-  req: AuthRequest,
-  res: Response
-) {
+export async function createPaymentIntentHandler(req: AuthRequest, res: Response) {
   try {
     const { bookingId } = req.body;
     if (!bookingId) {
@@ -26,6 +23,16 @@ export async function createPaymentIntentHandler(
   }
 }
 
+export async function confirmPaymentHandler(req: AuthRequest, res: Response) {
+  try {
+    const { bookingId } = req.params;
+    await handlePaymentSuccess(bookingId);
+    return res.status(200).json({ success: true });
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
+  }
+}
+
 export async function stripeWebhookHandler(req: Request, res: Response) {
   const sig = req.headers['stripe-signature'] as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -33,11 +40,7 @@ export async function stripeWebhookHandler(req: Request, res: Response) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      webhookSecret as string
-    );
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret as string);
   } catch (err: any) {
     return res.status(400).json({ error: `Webhook error: ${err.message}` });
   }
