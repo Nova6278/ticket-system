@@ -5,6 +5,9 @@
 **Live Demo:** [ticket-system-phi-woad.vercel.app](https://ticket-system-phi-woad.vercel.app)  
 **GitHub:** [github.com/Nova6278/ticket-system](https://github.com/Nova6278/ticket-system)
 
+⚠️ Note: Backend is hosted locally via tunnel.
+If the live demo is unavailable, please check back 
+after a few minutes or contact me at rajdeepoff78@gmail.com
 ---
 
 ## 📌 Table of Contents
